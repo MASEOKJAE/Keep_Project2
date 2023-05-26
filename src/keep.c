@@ -51,11 +51,18 @@ void keep_init(){
 
     //Make tracking-files in .keep dir
     FILE* track_file = fopen("./.keep/tracking-files","w");
+    FILE* version = fopen("./.keep/latest-version","w"); 
     if(track_file == NULL){
         printf("Failed to make tracking-files");
         exit(-1);
     }
-    else{
-        
+    if(version == NULL){
+        printf("Failed to make latest-version");
+        exit(-1);
     }
+
+    fprintf(version,"0");
+
+    fclose(track_file);
+    fclose(version);
 }
