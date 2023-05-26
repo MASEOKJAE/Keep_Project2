@@ -13,11 +13,11 @@
 * A user can create a backup space for a target directory, and then copy the 
 files in the directory to the backup space using keep
 * User commands
-  - <span style="color:red">keep init</span>: construct a backup space for the current directory, and initialize it
-  - keep track <file or directory>: start to track a specified file or all files under the specified directory as backup targets
+  - <font color="red">keep init<font>: construct a backup space for the current directory, and initialize it
+  - keep track  \<file or directory\>: start to track a specified file or all files under the specified directory as backup targets
   - keep untrack <file or directory>: cancel tracking the specified file or all fines under the specified directory
-  - keep store “<note>”: store the current status of the current directory
-  - keep restore <version>: bring back the status of the specified version
+  - keep store "\<note\>": store the current status of the current directory
+  - keep restore \<version\>: bring back the status of the specified version
   - keep versions: show the list of versions
   
 ***
@@ -31,10 +31,10 @@ unique version number
 * The .keep directory has the following files and directories:
   - tracking-files : list up the information of all tracking files
   - latest-version : store the latest version number, or 0 at the beginning
-  - <version> : store all information and files of the specified version (e.g., 1, 2)
-  - tracking-files
-  - note
-  - target : the directory for holding the backup files
+  - \<version\> : store all information and files of the specified version (e.g., 1, 2)
+    + tracking-files
+    + note
+    + target : the directory for holding the backup files
   
 ***
   
@@ -43,12 +43,12 @@ unique version number
   * make .keep at the current directory, and create tracking-files as an empty file and latest-version to have 0
   * print an error message if .keep already exists
   
-  ### keep track <file or directory>
+  ### keep track \<file or directory\>
   * add the entry of the specified file, or the entries of all files under the specified directory to tracking-files
     - a file entry consists of the file path, and its last modification time
     - when a file is newly added, define the last modification time as 0
   
-  ### keep untrack <file or directory>
+  ### keep untrack \<file or directory\>
   * remove the entry of the specified file, or the entries of all files under the specified directory to tracking-files
   
   ### keep versions
@@ -67,24 +67,24 @@ unique version number
       + if unmodified, create a hard link to the file of the latest version
   * increment the latest version number
   
-  ### keep restore <version>
+  ### keep restore \<version\>
   * check if any tracking file was modified after the latest store or restore, and reject the command if a modified file exists
     - for each tracking file, compare the actual last modification time and the one in tracking-flies
   * copy each tracking file from the version directory to the target directory
   * erase non-tracking files
-  * update _./keep/tracking-files_
+  * update ` ./keep/tracking-files `
   
   ***
   
-  ##Other Requirements
-    * Assume that no hard or symbolic links exist under the target directory
-    * Assume that a user does not use keep for a directory in parallel
-    * Show proper error messages to different exceptional cases, and handle them properly
-    * Write a build script as Makefile
+  ## Other Requirements
+   * Assume that no hard or symbolic links exist under the target directory
+   * Assume that a user does not use keep for a directory in parallel
+   * Show proper error messages to different exceptional cases, and handle them properly
+   * Write a build script as Makefile
   
   ***
   
-  ##Instructions
+  ## Instructions
   * Open chat for Q&A: https://open.kakao.com/o/gII0Vjbf(https://open.kakao.com/o/gII0Vjbf)
   * Demo video
     - No more than 5 minutes.
@@ -99,7 +99,7 @@ unique version number
 
   ***
   
-##Evaluation
+## Evaluation
 * Your result will be evaluated according to the following criteria:
   - all functionalities are correctly implemented
   - the source code is clean and comprehensible 
