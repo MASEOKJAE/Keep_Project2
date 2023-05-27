@@ -6,37 +6,48 @@
 #include <unistd.h>
 
 enum Command{
-    INIT
+    INIT,
+    TRACT
 };
+
+const char* keep_dir = "./.keep";
+const char* trackFilePath = "./.keep/tracking-files";
+const char* versionFilePath = "./.keep/latest-version";
+
 int commandNumber(char* commandNmae);
 void keep_init();
+void keep_track(char* fileName);
 
 int main(int argc, char** args)
 {
     if(argc == 0){
-        perror("help message");
+        printf("help message");
         return -1;
     }
     
-    switch(commandNumber(args[0])){
+    switch(commandNumber(args[1])){
         case INIT:
             keep_init();
             break;
+        case TRACT:
+            keep_track(args[2]);
+            break;
         default:
-            perror("help message");
+            printf("help message: invaild command");
             return -1;
     }
-
 }
+
 int commandNumber(char* commandName){
-    if(strcmp(commandName,"init")){
+    if(strcmp(commandName,"init") == 0){
         return INIT;
-    }else return 0;
+    }else if(strcmp(commandName,"track") == 0){
+        return TRACT;
+    }else
+     return -1;
 }
 
 void keep_init(){
-    char* keep_dir = ".keep";
-
     //Make .keep diractory
     if(access(keep_dir,F_OK) != -1){
         printf(".keep already exist");
@@ -49,20 +60,35 @@ void keep_init(){
         }            
     }
 
-    //Make tracking-files in .keep dir
-    FILE* track_file = fopen("./.keep/tracking-files","w");
-    FILE* version = fopen("./.keep/latest-version","w"); 
+    //Make tracking-files and latest-version in .keep dir
+    FILE* track_file = fopen(trackFilePath,"w");
+    FILE* version_file = fopen(versionFilePath,"w"); 
     if(track_file == NULL){
         printf("Failed to make tracking-files");
         exit(-1);
     }
-    if(version == NULL){
+    if(version_file == NULL){
         printf("Failed to make latest-version");
         exit(-1);
     }
 
-    fprintf(version,"0");
+    fprintf(version_file,"0");
 
     fclose(track_file);
-    fclose(version);
+    fclose(version_file);
+}
+
+void keep_track(char* fileName){
+
+    FILE* track_file = fopen(trackFilePath,"a");
+
+    if(track_file == NULL){
+        printf("Failed to open tracking-files");
+        exit(-1);
+    }
+
+    fprintf(track_file,fileName);
+    fprintf(track_file,"\n");
+
+    fclose(track_file);
 }
