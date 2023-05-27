@@ -80,14 +80,47 @@ void keep_init(){
 
 void keep_track(char* fileName){
 
-    FILE* track_file = fopen(trackFilePath,"a");
+    // tracking-file check
+    if(access(trackFilePath,F_OK) == -1){
+        printf("tracking-file doesn\'exist");
+        exit(-1);
+    }
 
+    //fileName check
+    char onlyFileName[128] = ".\\";
+    char* temp = strrchr(fileName,'\\') + 1;
+    if(temp == NULL) temp = fileName;
+    strcat(onlyFileName,temp);
+
+    printf(onlyFileName);
+    printf("\n");
+
+    if(access(onlyFileName,F_OK) == -1){
+        printf("invalid file name");
+        exit(-1);
+    }
+
+    //check a file name duplicated
+    FILE* track_file_r = fopen(trackFilePath,"r+");
+    char str_cmp[128];
+    while(!feof(track_file_r)){
+        fgets(str_cmp,128,track_file_r);
+        //if (strstr(str_cmp,onlyFileName) != NULL) 
+    }
+
+    fclose(track_file_r);
+
+    //modify tracking-file
+    FILE* track_file = fopen(trackFilePath,"a");
     if(track_file == NULL){
         printf("Failed to open tracking-files");
         exit(-1);
     }
 
-    fprintf(track_file,fileName);
+    fprintf(track_file,onlyFileName);
+    fprintf(track_file," ");
+
+    fprintf(track_file,"0");
     fprintf(track_file,"\n");
 
     fclose(track_file);
