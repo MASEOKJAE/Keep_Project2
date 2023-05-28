@@ -7,7 +7,11 @@
 
 enum Command{
     INIT,
-    TRACT
+    TRACT,
+    UNTRACT,
+    STORE,
+    RESTORE,
+    VERSION
 };
 
 const char* keep_dir = "./.keep";
@@ -17,6 +21,7 @@ const char* versionFilePath = "./.keep/latest-version";
 int commandNumber(char* commandNmae);
 void keep_init();
 void keep_track(char* fileName);
+void keep_store(char* messaage);
 
 int main(int argc, char** args)
 {
@@ -32,6 +37,9 @@ int main(int argc, char** args)
         case TRACT:
             keep_track(args[2]);
             break;
+        case STORE:
+            keep_store(args[2]);
+            break;
         default:
             printf("help message: invaild command");
             return -1;
@@ -43,7 +51,9 @@ int commandNumber(char* commandName){
         return INIT;
     }else if(strcmp(commandName,"track") == 0){
         return TRACT;
-    }else
+    }else if(strcmp(commandName,"store") == 0){
+        return STORE;
+    }else 
      return -1;
 }
 
@@ -89,11 +99,8 @@ void keep_track(char* fileName){
     //fileName check
     char onlyFileName[128] = ".\\";
     char* temp = strrchr(fileName,'\\') + 1;
-    if(temp == NULL) temp = fileName;
+    if(temp == (char*)1) temp = fileName;  
     strcat(onlyFileName,temp);
-
-    printf(onlyFileName);
-    printf("\n");
 
     if(access(onlyFileName,F_OK) == -1){
         printf("invalid file name");
@@ -102,10 +109,19 @@ void keep_track(char* fileName){
 
     //check a file name duplicated
     FILE* track_file_r = fopen(trackFilePath,"r+");
-    char str_cmp[128];
+    char line[128];
+    struct stat file_info;
+    stat(onlyFileName,&file_info);
     while(!feof(track_file_r)){
-        fgets(str_cmp,128,track_file_r);
-        //if (strstr(str_cmp,onlyFileName) != NULL) 
+        fgets(line,128,track_file_r);
+        if (strstr(line,onlyFileName) != NULL) {
+            long int fpi = ftell(track_file_r);
+            printf("before seek: %d\n",fpi);
+            fseek(track_file_r,-1,SEEK_CUR);
+            printf("after seek: %d\n",fpi);
+            fprintf(track_file_r,"1");
+            return;
+        }
     }
 
     fclose(track_file_r);
@@ -124,4 +140,54 @@ void keep_track(char* fileName){
     fprintf(track_file,"\n");
 
     fclose(track_file);
+}
+
+void keep_store(char* messaage){
+    //identify which tracking files has been modified
+    char target[64][128];
+    int targetCount = 0;
+    
+    char line[128];
+    FILE* tractFile = fopen(trackFilePath,"r");
+
+    while(fgets(line,128,tractFile) != NULL){
+        printf("%s\n",line);
+        char fileName[128];
+        time_t m_time;
+
+        if(sscanf(line,"%s %d",fileName,m_time) == 2){
+            printf("%s,%d\n",fileName,m_time);
+
+            struct stat file_info;
+            stat(fileName,&file_info);
+
+            printf("%d : %d\n",file_info.st_mtime,m_time);
+            if(file_info.st_mtime > m_time){
+                strcpy(target[targetCount],fileName);
+                targetCount++;
+
+                printf("%d)%s\n",targetCount,target[targetCount-1]);
+            }
+        }
+    }
+    fclose(tractFile);
+
+    //set up the version directory under .keep
+    if(access(keep_dir,F_OK) == -1){
+        printf(".keep does not exist");
+        exit(-1);
+    }
+
+    FILE* version = fopen(versionFilePath,"r");
+    int ver = fgetc(version) + 1;
+    fclose(version);
+
+    char filePath[56];
+    sprintf(filePath,"%s/%c",keep_dir,ver);
+
+    if(mkdir(filePath) != 0){
+        printf("failed to make version dir");
+        exit(-1);
+    }
+
 }
